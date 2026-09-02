@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدير المصاريف الشخصية</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 30px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 24px 20px;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 16px;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-item label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .summary-item span {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:active {
+            background: var(--primary-dark);
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .item-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .item-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .item-amount {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>مصاريفي الشخصية</h1>
+        <div class="summary-card">
+            <div class="summary-item">
+                <label>إجمالي المصاريف</label>
+                <span id="total-amount">0.00</span> <small>ج.م</small>
+            </div>
+            <div class="summary-item" style="text-align: left;">
+                <label>عدد العمليات</label>
+                <span id="total-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>إضافة مصروف جديد</h2>
+            <form id="expense-form">
+                <div class="form-group">
+                    <label for="title">بيان المصروف</label>
+                    <input type="text" id="title" placeholder="مثال: مواصلات، أدوات مكتبية، طعام" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">المبلغ (بالجنيه المصري)</label>
+                    <input type="number" id="amount" step="0.5" placeholder="0.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">الفئة</label>
+                    <select id="category">
+                        <option value="عام">عام</option>
+                        <option value="طعام وشراب">طعام وشراب</option>
+                        <option value="مواصلات">مواصلات</option>
+                        <option value="أدوات وتعليم">أدوات وتعليم</option>
+                        <option value="ألعاب وترفيه">ألعاب وترفيه</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">تسجيل المصروف</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>سجل المصاريف</h2>
+            <ul id="expense-list" class="history-list"></ul>
+            <div id="empty-msg" class="empty-state">لا توجد مصاريف مسجلة حتى الآن.</div>
+        </section>
+    </main>
+
+    <script>
+        let expenses = JSON.parse(localStorage.getItem('my_expenses')) || [];
+
+        const form = document.getElementById('expense-form');
+        const titleInput = document.getElementById('title');
+        const amountInput = document.getElementById('amount');
+        const categoryInput = document.getElementById('category');
+        const expenseList = document.getElementById('expense-list');
+        const totalAmountEl = document.getElementById('total-amount');
+        const totalCountEl = document.getElementById('total-count');
+        const emptyMsg = document.getElementById('empty-msg');
+
+        function updateUI() {
+            expenseList.innerHTML = '';
+            let total = 0;
+
+            if (expenses.length === 0) {
+                emptyMsg.style.display = 'block';
+            } else {
+                emptyMsg.style.display = 'none';
+            }
+
+            expenses.forEach((item, index) => {
+                total += parseFloat(item.amount);
+
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <div class="item-info">
+                        <h4>${item.title}</h4>
+                        <p>${item.category} • ${item.date}</p>
+                    </div>
+                    <div class="item-amount">
+                        -${parseFloat(item.amount).toFixed(2)} ج.م
+                        <button class="delete-btn" onclick="deleteExpense(${index})">&times;</button>
+                    </div>
+                `;
+                expenseList.appendChild(li);
+            });
+
+            totalAmountEl.textContent = total.toFixed(2);
+            totalCountEl.textContent = expenses.length;
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+            const title = titleInput.value.trim();
+            const amount = amountInput.value.trim();
+            const category = categoryInput.value;
+
+            if (!title || !amount) return;
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+
+            expenses.unshift({ title, amount, category, date: dateStr });
+            localStorage.setItem('my_expenses', JSON.stringify(expenses));
+
+            titleInput.value = '';
+            amountInput.value = '';
+            updateUI();
+        }
+
+        function deleteExpense(index) {
+            expenses.splice(index, 1);
+            localStorage.setItem('my_expenses', JSON.stringify(expenses));
+            updateUI();
+        }
+
+        form.addEventListener('submit', addExpense);
+        updateUI();
+    </script>
+</body>
+</html>
